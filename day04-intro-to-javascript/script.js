@@ -66,4 +66,3 @@ const jobs = [
     postDate: "6 days ago",
   },
 ];
-
