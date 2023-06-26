@@ -66,3 +66,6 @@ const jobs = [
     postDate: "6 days ago",
   },
 ];
+
+
+const jobList = document.getElementsByClassName("j-desc");
