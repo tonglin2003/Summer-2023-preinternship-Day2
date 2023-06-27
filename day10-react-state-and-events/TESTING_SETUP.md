@@ -45,6 +45,8 @@ npm install --save-dev vitest @testing-library/react @testing-library/jest-dom j
 ```
 
 3. We also want to configure vite to work with JSDOM in the test environment inside of `defineConfig()`:
+   File: vite.config.js
+   inside the file's defineConfig object
 
 ```js
 test: {
