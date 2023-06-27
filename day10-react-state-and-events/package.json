@@ -1,0 +1,7 @@
+{
+  "devDependencies": {
+    "eslint-plugin-jest-dom": "^5.0.1",
+    "eslint-plugin-testing-library": "^5.11.0",
+    "eslint-plugin-vitest": "^0.2.6"
+  }
+}
