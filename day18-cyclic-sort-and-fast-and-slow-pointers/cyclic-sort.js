@@ -1,6 +1,20 @@
 function cyclicSort(nums) {
+    // set a for loop through th nums
+      // if i != nums[i]
+      // swap it to correct place, nums[i] = i
   
-}
+      for (let i = 0; i < nums.length; i++)
+      {
+          currentIndex = i+1;
+          currentContent = nums[i]
+          if (currentContent != currentIndex)
+          {
+              [nums[i], nums[currentContent-1]] = [nums[currentContent-1], nums[i]]
+          }
+      }
+  
+      return nums;
+  }
 
 /*----------------------------------------------------------------
 i = 0, arr[i] is 5 which should be at index 4 so swap values at i(0) and 4

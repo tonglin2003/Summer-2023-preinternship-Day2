@@ -1,14 +1,23 @@
 const express = require("express");
+const session = require("express-session");
 const app = express();
 const port = 4000;
-const session = require("express-session");
 require("dotenv").config();
+const cors = require("cors");
 const authRouter = require("./routes/auth");
 const jobsRouter = require("./routes/jobs");
 const {
   forbiddenErrorHandler,
   notFoundErrorHandler,
 } = require("./middleware/errorHandlers");
+
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    allowedHeaders: ["Content-Type", "Authorization"],
+    methods: ["GET", "POST", "PATCH", "DELETE"],
+  })
+);
 
 app.use((req, res, next) => {
   console.log(`Request: ${req.method} ${req.originalUrl}`);
@@ -18,6 +27,7 @@ app.use((req, res, next) => {
   });
   next();
 });
+
 app.use(express.json());
 app.use(
   session({
@@ -32,9 +42,18 @@ app.use(
 app.use(forbiddenErrorHandler);
 app.use(notFoundErrorHandler); 
 
+
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    allowedHeaders: ["Content-Type", "Authorization"],
+    methods: ["GET", "POST", "PATCH", "DELETE"],
+  })
+);
+
 // routes
-app.use("/auth", authRouter);
-app.use("/jobs", jobsRouter);
+app.use("/api/auth", authRouter);
+app.use("/api/jobs", jobsRouter);
 
 
 app.listen(port, () => {

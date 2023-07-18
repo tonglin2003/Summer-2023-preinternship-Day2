@@ -4,6 +4,9 @@ const port = 4000;
 const jobs = require("./jobs");
 require("dotenv").config();
 
+
+const { query } = require('./database');
+
 app.use((req, res, next) => {
   res.on("finish", () => {
     // the 'finish' event will be emitted when the response is handed over to the OS
@@ -24,30 +27,61 @@ app.get("/", (req, res) => {
 });
 
 // Get all the jobs
-app.get("/jobs", (req, res) => {
-  res.send(jobs);
+app.get("/jobs", async (req, res) => {
+  try{
+    const allJobs = await query("SELECT * FROM job_application");
+    res.status(200).json(allJobs.rows);
+  }catch(error)
+  {
+    console.error(error);
+  }
 });
 
 // Get a specific job
-app.get("/jobs/:id", (req, res) => {
+app.get("/jobs/:id", async (req, res) => {
   const jobId = parseInt(req.params.id, 10);
-  const job = jobs.find((j) => j.id === jobId);
-  if (job) {
-    res.send(job);
-  } else {
-    res.status(404).send({ message: "Job not found" });
+  try{
+    const job = await query("SELECT * FROM job_application where id=$1", [jobId])
+    
+    if (job.rows.length > 0) 
+    {
+      res.status(200).json(job.rows[0]);
+    }
+    else{
+      res.status(404).send({message: "Job not found"});
+    }
+
+  }catch(error)
+  {
+    console.error(error)
   }
 });
 
 // Create a new job
-app.post("/jobs", (req, res) => {
-  const newJob = {
-    ...req.body,
-    id: getNextIdFromCollection(jobs),
-  };
-  jobs.push(newJob);
-  console.log("newJob", newJob);
-  res.status(201).send(newJob);
+app.post("/jobs", async (req, res) => {
+  const {
+    company,
+    title, 
+    minSalary, 
+    maxSalary, 
+    location, 
+    postDate, 
+    jobPostUrl, 
+    applicationDate, 
+    lastContactDate, 
+    companyContact, 
+    status} = req.body;
+
+  try{
+    const newJob = await query(
+      "INSERT INTO job_application (company,title, minSalary,  maxSalary, location, postDate, jobPostUrl, applicationDate, lastContactDate, companyContact, status) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *",
+      [company,title, minSalary,  maxSalary, location, postDate, jobPostUrl, applicationDate, lastContactDate, companyContact, status]
+    );
+    res.status(201).json(newJob.rows[0]);
+
+  }catch(error){
+    console.error(error);
+  }
 });
 
 // Update a specific job
@@ -83,3 +117,5 @@ app.delete("/jobs/:id", (req, res) => {
 app.listen(port, () => {
   console.log(`Server is running at http://localhost:${port}`);
 });
+
+

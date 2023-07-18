@@ -65,7 +65,7 @@ router.post("/login", async (req, res) => {
 
         req.session.userId = user.id;
         res.status(200).json({
-          message: "Logged in successfully",
+          message: `Logged in successfully. user.id: ${user.id} and session: ${req.session.userId}`,
           user: {
             name: user.name,
             email: user.email,
@@ -81,6 +81,24 @@ router.post("/login", async (req, res) => {
     res
       .status(500)
       .json({ message: "An error occurred during the login process" });
+  }
+});
+
+router.get("/current_user", async (req, res)=>{
+  if (req.session.userId){
+    const user = await User.findByPk(req.session.userId);
+
+    return res.status(200).json({
+      user:{
+        id: user.id,
+        email: user.email,
+        name: user.name
+      }
+    });
+  }
+  else{
+    return res.status(401).json({user: null});
+
   }
 });
 

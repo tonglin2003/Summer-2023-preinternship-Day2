@@ -3,12 +3,13 @@ import { statusTextById, statusIdByText } from "../../utils";
 import JobCard from "../../JobCard";
 
 export async function loader({ params }) {
-  let url = "http://localhost:3000/jobs";
+  let url = "http://localhost:4000/api/jobs";
   if (params.status) {
     url += `?status=${statusIdByText[params.status]}`;
   }
   const response = await fetch(url);
   const jobs = await response.json();
+  console.log(jobs)
   return { jobs };
 }
 

@@ -1,3 +1,4 @@
+// seeds file
 "use strict";
 
 /** @type {import('sequelize-cli').Migration} */
@@ -17,7 +18,7 @@ module.exports = {
     );
     const users = await queryInterface.sequelize.query(`SELECT id FROM users`);
 
-    const userId = users[0][1].id;
+    const userId = users[0][0].id;
     
     await queryInterface.bulkInsert(
       "job_applications",

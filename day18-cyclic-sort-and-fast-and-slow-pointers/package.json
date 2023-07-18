@@ -1,15 +1,16 @@
 {
   "name": "day18-cyclic-sort-and-fast-and-slow-pointers",
   "version": "1.0.0",
-  "description": "",
+  "description": "In today's lesson we'll be discussing these two algorithms in detail and what kinds of interview questions they can be applied to:",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "jest": "^29.6.1"
+    "jest": "^29.6.1",
+    "save-dev": "^0.0.1-security"
   }
 }

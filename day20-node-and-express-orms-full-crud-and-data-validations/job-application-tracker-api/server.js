@@ -3,6 +3,7 @@ const app = express();
 const port = 4000;
 const { query } = require("./database");
 require("dotenv").config();
+const { JobApplication } = require('./models');
 
 app.use((req, res, next) => {
   console.log(`Request: ${req.method} ${req.originalUrl}`);
@@ -27,7 +28,8 @@ app.get("/", (req, res) => {
 // Get all the jobs
 app.get("/jobs", async (req, res) => {
   try {
-    const allJobs = await query("SELECT * FROM job_applications");
+    // const allJobs = await query("SELECT * FROM job_applications");
+    const allJobs = await JobApplication.findAll();
 
     res.status(200).json(allJobs.rows);
   } catch (err) {
@@ -40,9 +42,11 @@ app.get("/jobs/:id", async (req, res) => {
   const jobId = parseInt(req.params.id, 10);
 
   try {
-    const job = await query("SELECT * FROM job_applications WHERE id = $1", [
-      jobId,
-    ]);
+    // const job = await query("SELECT * FROM job_applications WHERE id = $1", [
+    //   jobId,
+    // ]);
+
+    const job = await JobApplication.findOne({where: {id: jobId}});
 
     if (job.rows.length > 0) {
       res.status(200).json(job.rows[0]);
@@ -56,37 +60,25 @@ app.get("/jobs/:id", async (req, res) => {
 
 // Create a new job
 app.post("/jobs", async (req, res) => {
-  const {
-    company,
-    title,
-    minSalary,
-    maxSalary,
-    location,
-    postDate,
-    jobPostUrl,
-    applicationDate,
-    lastContactDate,
-    companyContact,
-    status,
-  } = req.body;
-
   try {
-    const newJob = await query(
-      "INSERT INTO job_applications (company, title, minSalary, maxSalary, location, postDate, jobPostUrl, applicationDate, lastContactDate, companyContact, status) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *",
-      [
-        company,
-        title,
-        minSalary,
-        maxSalary,
-        location,
-        postDate,
-        jobPostUrl,
-        applicationDate,
-        lastContactDate,
-        companyContact,
-        status,
-      ]
-    );
+    // const newJob = await query(
+    //   "INSERT INTO job_applications (company, title, minSalary, maxSalary, location, postDate, jobPostUrl, applicationDate, lastContactDate, companyContact, status) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *",
+    //   [
+    //     company,
+    //     title,
+    //     minSalary,
+    //     maxSalary,
+    //     location,
+    //     postDate,
+    //     jobPostUrl,
+    //     applicationDate,
+    //     lastContactDate,
+    //     companyContact,
+    //     status,
+    //   ]
+    // );
+
+    const newJob = await JobApplication.create(req.body);
 
     res.status(201).json(newJob.rows[0]);
   } catch (err) {
@@ -98,34 +90,37 @@ app.post("/jobs", async (req, res) => {
 app.patch("/jobs/:id", async (req, res) => {
   const jobId = parseInt(req.params.id, 10);
 
-  const fieldNames = [
-    "company",
-    "title",
-    "minSalary",
-    "maxSalary",
-    "location",
-    "postDate",
-    "jobPostUrl",
-    "applicationDate",
-    "lastContactDate",
-    "companyContact",
-    "status",
-    "jobId",
-  ].filter((name) => req.body[name]);
+  // const fieldNames = [
+  //   "company",
+  //   "title",
+  //   "minSalary",
+  //   "maxSalary",
+  //   "location",
+  //   "postDate",
+  //   "jobPostUrl",
+  //   "applicationDate",
+  //   "lastContactDate",
+  //   "companyContact",
+  //   "status",
+  //   "jobId",
+  // ].filter((name) => req.body[name]);
 
-  let updatedValues = fieldNames.map(name => req.body[name]);
-  const setValues = fieldNames.map((name, i) => {
-    return `${name} = $${i + 1}`
-  }).join(', ');
+  // let updatedValues = fieldNames.map(name => req.body[name]);
+  // const setValues = fieldNames.map((name, i) => {
+  //   return `${name} = $${i + 1}`
+  // }).join(', ');
 
   try {
-    const updatedJob = await query(
-      `UPDATE job_applications SET ${setValues} WHERE id = $${fieldNames.length+1} RETURNING *`,
-      [...updatedValues, jobId]
-    );
+    // const updatedJob = await query(
+    //   `UPDATE job_applications SET ${setValues} WHERE id = $${fieldNames.length+1} RETURNING *`,
+    //   [...updatedValues, jobId]
+    // );
 
-    if (updatedJob.rows.length > 0) {
-      res.status(200).json(updatedJob.rows[0]);
+    const [numberOfAffectedRows, affectedRows] = await JobApplication.update(req.body, { where: { id: jobId }, returning: true });
+
+
+    if (numberOfAffectedRows > 0) {
+      res.status(200).json(affectedRows[0]);
     } else {
       res.status(404).send({ message: "Job not found" });
     }
@@ -140,9 +135,7 @@ app.delete("/jobs/:id", async (req, res) => {
   const jobId = parseInt(req.params.id, 10);
 
   try {
-    const deleteOp = await query("DELETE FROM job_applications WHERE id = $1", [
-      jobId,
-    ]);
+    const deleteOp = await JobApplication.destroy({ where: { id: jobId } });
 
     if (deleteOp.rowCount > 0) {
       res.status(200).send({ message: "Job deleted successfully" });

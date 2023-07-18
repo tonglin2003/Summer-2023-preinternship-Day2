@@ -1,19 +1,12 @@
-const dotenv = require('dotenv');
+require("dotenv").config();
 
-const result = dotenv.config();
-
-if (result.error) {
-  throw result.error;
-}
-
-module.exports = 
-{
+module.exports = {
   "development": {
     "username": process.env.DB_USER,
     "password": process.env.DB_PASSWORD,
     "database": process.env.DB_NAME,
     "host": process.env.DB_HOST,
-    "dialect": "postgres",
+    "dialect": "postgres"
   },
   "test": {
     "username": "root",
