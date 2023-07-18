@@ -5,28 +5,40 @@ import { AuthContext } from "../../contexts/AuthContext";
 export async function action({ request }) {
   const formData = await request.formData();
 
-  const response = await fetch("/api/auth/login", {
+  const response = await fetch("/auth/signup", {
     method: "POST",
     headers: {
-      "Content-Type": "application/json"
-    }, 
-    body: JSON.stringify(Object.fromEntries(formData))
-  })
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(formData),
+  });
 
   if (!response.ok) {
+    // invalid submission, remain on signup page
     return null;
   }
 
   return redirect("/");
 }
 
-export default function Login() {
+function Signup() {
   const { currentUser } = useContext(AuthContext);
-  if(currentUser) { return <Navigate to="/" /> }
+  if (currentUser) {
+    return <Navigate to="/" />;
+  }
   return (
     <Form method="post" className="selection:bg-blue-200 flex flex-col gap-2">
-      <h1 className="text-white">Login</h1>
+      <h1 className="text-white">Signup</h1>
 
+      <fieldset className="flex flex-col">
+        <label htmlFor="title">Name</label>
+        <input
+          type="text"
+          name="name"
+          id="name"
+          className="border-4 focus:outline-none p-2"
+        />
+      </fieldset>
       <fieldset className="flex flex-col">
         <label htmlFor="title">Email</label>
         <input
@@ -52,3 +64,5 @@ export default function Login() {
     </Form>
   );
 }
+
+export default Signup;

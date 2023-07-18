@@ -2,7 +2,10 @@ import * as React from "react";
 import * as ReactDOM from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import "./index.css";
-import Root, {loader as rootLoader} from "./routes/root";
+import Root, {
+  loader as rootLoader,
+  action as logoutAction,
+} from "./routes/root";
 import ErrorPage from "./ErrorPage";
 import JobList, { loader as jobLoader } from "./routes/jobs/JobList";
 import Job, {
@@ -16,12 +19,10 @@ import EditJob, {
 } from "./routes/jobs/editJob";
 import { action as destroyNoteAction } from "./routes/notes/destroyNote";
 import { action as updateNoteAction } from "./routes/notes/updateNote";
-import ProtectedRoute from "./routes/ProtectedRoute";
-
 import AuthProvider from "./contexts/AuthContext";
-
-import Login, {action as loginAction} from "./routes/auth/Login";
-import Signup, {action as signupAction} from "./routes/auth/Singup";
+import ProtectedRoute from "./routes/ProtectedRoute";
+import Login, { action as loginAction } from "./routes/auth/Login";
+import Signup, { action as signupAction } from "./routes/auth/Signup";
 
 const router = createBrowserRouter([
   {
@@ -29,6 +30,7 @@ const router = createBrowserRouter([
     element: <Root />,
     errorElement: <ErrorPage />,
     loader: rootLoader,
+    action: logoutAction,
     children: [
       {
         index: true,
@@ -40,35 +42,51 @@ const router = createBrowserRouter([
         loader: jobLoader,
       },
       {
-        path:"/login",
-        element: <Login/>,
-        action: loginAction
+        path: "login",
+        element: <Login />,
+        action: loginAction,
       },
       {
-        path: "/signup",
-        element: <Signup/>,
-        action: signupAction
+        path: "signup",
+        element: <Signup />,
+        action: signupAction,
       },
       {
         path: "jobs/new",
-        element: <AddJob />,
+        element: (
+          <ProtectedRoute>
+            <AddJob />
+          </ProtectedRoute>
+        ),
         action: addJobAction,
       },
       {
         path: "jobs/byStatus/:status",
-        element: <JobList />,
+        element: (
+          <ProtectedRoute>
+            <JobList />
+          </ProtectedRoute>
+        ),
         loader: jobLoader,
       },
       {
         path: "jobs/:jobId",
-        element: <Job />,
+        element: (
+          <ProtectedRoute>
+            <Job />
+          </ProtectedRoute>
+        ),
         errorElement: <ErrorPage />,
         loader: jobDetailLoader,
         action: notesAction,
       },
       {
         path: "jobs/:jobId/edit",
-        element: <EditJob />,
+        element: (
+          <ProtectedRoute>
+            <EditJob />
+          </ProtectedRoute>
+        ),
         errorElement: <ErrorPage />,
         loader: editJobLoader,
         action: editJobAction,
